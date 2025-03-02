@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>紫罗兰永恒花园</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="favicon.ico">
+    <meta name="keywords" content="紫罗兰永恒花园, 紫罗兰, 薇尔莉特，薇尔莉特伊芙加登，薇尔莉特-伊芙加登,晓佳奈,基尔伯特,布甘比利亚,violet,VioletEverGarden,ヴァイオレット・エヴァーガーデン,ヴァイオレット">
+    <meta name="description" content="紫罗兰永恒花园(ヴァイオレット・エヴァーガーデン)">
+    <script type="text/javascript" src="0.js"></script>
+    <style>
+        body {
+            overflow: auto;
+            overflow-y: auto; /* 垂直滚动 */
+            overflow-x: hidden; /* 隐藏水平滚动条 */
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .media-viewer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.97);
+        display: none;
+        z-index: 4000;
+    }
+    
+    .media-content {
+        max-width: 90%;
+        max-height: 90%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        object-fit: contain;
+    }
+    
+    .video-content {
+        width: 80%;
+        height: auto;
+    }
+    
+    .media-controls {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 15px;
+        background: rgba(255,255,255,0.1);
+        padding: 10px 20px;
+        border-radius: 30px;
+        backdrop-filter: blur(5px);
+    }
+    
+    .control-btn {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 8px;
+        transition: opacity 0.3s;
+    }
+    
+    .media-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.5rem;
+        display: none;
+    }
+        /* 视频背景 */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        #bgVideo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            filter: blur(0px) brightness(1);
+            object-fit: cover;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 左侧图标容器 */
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-right: auto;
+        }
+
+        /* PNG图标样式 */
+        .brand-logo {
+            width: 50px;  /* 根据实际图标尺寸调整 */
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        /* 标题样式 */
+        .brand-text {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* 悬停动效 */
+        .brand-logo:hover {
+            transform: scale(1.1);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+            
+            .brand-logo {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .brand-text {
+                font-size: 1.2rem;
+            }
+        }
+
+    /* 添加关键帧动画 */
+    @keyframes slideUp {
+        from {
+         opacity: 0;
+         transform: translateY(50px); /* 初始位置下移 */
+        }
+           to {
+         opacity: 1;                 /* 渐变显示 */
+         transform: translateY(0);   /* 滑动到原始位置 */
+  }
+}
+
+        
+        /* 资源卡片 */
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 0;
+            padding: 2rem;
+        }
+
+        .resource-card {
+            background: rgba(255, 255, 255, 0.135);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            margin-left:120px;
+            margin-right:120px; 
+            position: relative;
+            margin-top: 110px; /* 添加卡片顶部间距 */
+            opacity: 0;
+            animation: slideUp 0.9s ease forwards; /* forwards 会保留动画结束状态 */
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .meta-info {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+
+    /* 视频详情页专属样式 */
+    .video-detail {
+        width: 300px; 
+        height: 200px;
+        max-width: 800px;
+        margin: 60px auto 0;
+    }
+    
+    .video-meta {
+        margin: 20px 0;
+        padding: 15px;
+        background: rgba(0,0,0,0.05);
+        border-radius: 8px;
+    }
+
+    .video-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .quality-selector {
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+        /* 音乐播放器 */
+        .music-player {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.142);
+            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .music-control {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #a683de00;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .music-control:hover {
+            transform: scale(1.15);
+            background: #ca77d7;
+        }
+
+        /* 详情页 */
+        .detail-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            overflow: auto;
+        }
+
+        .detail-view.active {
+            transform: translateY(0);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 12px 20px;
+            border-radius: 30px;
+            background: rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .resource-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .resource-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .resource-media {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+            cursor: zoom-in;
+        }
+        .detail-view.active {
+            transform: translateY(0);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 12px 20px;
+            border-radius: 30px;
+            background: rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .resource-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .resource-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .resource-media {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+            cursor: zoom-in;
+        }
+        /* 详情页容器 */
+        .detail-container {
+            max-width: 1200px;
+            margin: 80px auto 0;
+            padding: 2rem;
+        }
+         /* 详情页容器2 */
+         .detail-container {
+            max-width: 1200px;
+            margin: 80px auto 0;
+            padding: 2rem;
+        }
+        /* 自适应图片网格 */
+        .adaptive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* 图片容器 */
+        .media-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #f8f9fa;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            aspect-ratio: 16/9; /* 默认宽高比 */
+        }
+
+        /* 图片自适应规则 */
+        .adaptive-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        /* 智能宽高比检测 */
+        .media-container[data-ratio="portrait"] {
+            aspect-ratio: 3/4;
+        }
+
+        .media-container[data-ratio="square"] {
+            aspect-ratio: 1/1;
+        }
+
+        /* 悬停效果 */
+        .media-container:hover .adaptive-media {
+            transform: scale(1.05);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .detail-container {
+                padding: 1rem;
+            }
+            
+            .adaptive-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .media-container {
+                aspect-ratio: 1/1; /* 移动端统一比例 */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .media-container {
+                aspect-ratio: 4/3;
+            }
+        }
+        /* 捐助弹窗 */
+        .donate-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.489);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .donate-box {
+            background: rgb(255, 255, 255);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .qrcode-group {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        .qrcode-item {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .qrcode-item img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #eeeeee46;
+            border-radius: 8px;
+        }
+
+        /* 媒体查看器 */
+        .media-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.97);
+            display: none;
+            z-index: 4000;
+        }
+
+        .media-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            object-fit: contain;
+        }
+
+        .media-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.142);
+            display: none;
+        }
+
+
+        /* 缩放控制 */
+        .zoom-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 20px;
+            display: flex;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .zoom-percent {
+            color: white;
+            min-width: 60px;
+            text-align: center;
+            line-height: 40px;
+            font-size: 0.9rem;
+        }
+
+        /* 底部声明 */
+        .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0);
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin-top: 80px;
+            }
+            
+            .music-player {
+                bottom: 60px;
+                width: calc(100% - 40px);
+            }
+            
+            .qrcode-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <audio controls="controls" autoplay="autoplay" src="music2.mp3.mp3"></audio>
+    <!-- 视频背景 -->
+    <div class="video-background">
+        <video autoplay muted loop id="bgVideo">
+            <source src="背景.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="logo.png" 
+                 alt="网站Logo" 
+                 class="brand-logo"
+                 loading="lazy">
+            <h1 class="brand-text">紫罗兰永恒花园</h1>
+        </div>
+        <div class="contact-info">
+            <span><i class="fas fa-phone"></i>178-3549-7007</span>
+            <span><i class="fas fa-envelope"></i>-3577186595@qq.com</span>
+        </div>
+    </nav>
+    <script>
+        // 音乐列表配置
+        const playlist = [
+            { title: '背景音乐1', src: 'music/music1.mp3' },
+            { title: '背景音乐2', src: 'music/music2.mp3' }
+        ];
+
+        // 播放器状态
+        let currentTrack = 0;
+        const audio = new Audio();
+        let isPlaying = false;
+        let initialized = false; // 新增初始化状态
+
+        // 初始化音频设置
+        function initAudio() {
+            audio.src = playlist[currentTrack].src;
+            audio.loop = false; // 禁用单曲循环
+            audio.preload = "auto";
+            
+            // 添加播放结束监听
+            audio.addEventListener('ended', () => {
+                changeTrack(1);
+                updateTrackInfo();
+            });
+        }
+
+        // 更新曲目信息
+        function updateTrackInfo() {
+            document.getElementById('trackInfo').textContent = 
+                `正在播放：${playlist[currentTrack].title}`;
+        }
+
+        // 播放/暂停控制
+        function toggleMusic() {
+            if (!initialized) return;
+            
+            const icon = document.querySelector('.music-control i');
+            if (isPlaying) {
+                audio.pause();
+                icon.classList.replace('fa-pause', 'fa-play');
+            } else {
+                audio.play().catch(error => {
+                    console.error('播放失败:', error);
+                });
+                icon.classList.replace('fa-play', 'fa-pause');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // 切换曲目（增强版）
+        function changeTrack(direction) {
+            currentTrack = (currentTrack + direction + playlist.length) % playlist.length;
+            audio.src = playlist[currentTrack].src;
+            
+            // 自动续播逻辑
+            if(isPlaying) {
+                audio.play().catch(error => {
+                    console.error('播放失败:', error);
+                    isPlaying = false;
+                });
+            }
+            updateTrackInfo();
+        }
+
+        // 页面点击初始化（符合自动播放策略）
+        document.addEventListener('click', function initPlayback() {
+            if (!initialized) {
+                initialized = true;
+                initAudio();
+                audio.play().then(() => {
+                    isPlaying = true;
+                    document.querySelector('.music-control i')
+                        .classList.replace('fa-play', 'fa-pause');
+                    updateTrackInfo();
+                }).catch(error => {
+                    console.error('自动播放失败:', error);
+                    document.getElementById('trackInfo').textContent = 
+                        "点击播放按钮开始";
+                });
+                // 移除初始化监听
+                document.removeEventListener('click', initPlayback);
+            }
+        });
+
+        // 预加载下一曲目
+        function preloadNextTrack() {
+            const nextIndex = (currentTrack + 1) % playlist.length;
+            const nextAudio = new Audio(playlist[nextIndex].src);
+            nextAudio.preload = "metadata";
+        }
+        preloadNextTrack(); // 初始预加载
+    </script>
+<!-- 图片卡片 -->
+<div class="resource-card" data-id="image">
+    <div class="meta-info">超分辨率</div>
+    <h3>图片</h3>
+    <p>本站内容均为超分辨率内容,加载速度与网络质量相关,请耐心等待</p >
+</div>
+
+<!-- 视频卡片 -->
+<div class="resource-card" data-id="video">
+    <div class="meta-info">自制+CM+PV+转载</div>
+    <h3>视频</h3>
+    <p>本站内容体积较大,加载速度与网络质量相关,请耐心等待</p >
+</div>
+    </div>
+
+    <!-- 详情页 -->
+    <div class="detail-view" id="detailView">
+        <div class="back-btn" onclick="closeDetail()">
+            <i class="fas fa-arrow-left"></i>
+            <span>返回</span>
+        </div>
+        <div class="resource-gallery" id="detailContent"></div>
+    </div>
+
+    <!-- 媒体查看器 -->
+    <div class="media-viewer" id="mediaViewer">
+        <div class="media-loading">正在加载...</div>
+        <div id="mediaContainer"></div>
+    </div>
+    <script>
+        
+        // 详情页数据
+        const resources = {
+            image: [
+                { type: 'image', src: '图片/1.jpg', resolution: '4000x5264', size: '2.7 MB' },
+                { type: 'image', src: '图片/2.png', resolution: '4320x5644', size: '1.7 M   B' },
+                { type: 'image', src: '图片/3.jpg', resolution: '6400x5740', size: '7.3 MB' },
+                { type: 'image', src: '图片/4.jpg', resolution: '6400x6400', size: '4.1 MB' },
+                { type: 'image', src: '图片/5.jpg', resolution: '5600x7704', size: '6.48 MB' },
+                { type: 'image', src: '图片/6.jpg', resolution: '1600x2242', size: '1.01 MB' },
+                { type: 'image', src: '图片/7.jpg', resolution: '7216x6400', size: '6.19 MB' },
+                { type: 'image', src: '图片/8.jpg', resolution: '4000x4928', size: '3.95 MB' },
+                { type: 'image', src: '图片/9.jpg', resolution: '4800x4800', size: '3.03 MB' },
+                { type: 'image', src: '图片/10.jpg', resolution: '4800x7144', size: '4.61 MB' },
+                { type: 'image', src: '图片/11.jpg', resolution: '4228x6000', size: '4.71 MB' },
+                { type: 'image', src: '图片/12.jpg', resolution: '4920x6988', size: '4.60 MB' },
+                { type: 'image', src: '图片/13.jpg', resolution: '2320x4124', size: '1.71 MB' },
+                { type: 'image', src: '图片/14.png', resolution: '4320x2972', size: '1.65 MB' },
+                { type: 'image', src: '图片/15.jpg', resolution: '4320x9360', size: '2.35 MB' },
+                { type: 'image', src: '图片/16.jpg', resolution: '3200x4524', size: '2.94 MB' },
+                { type: 'image', src: '图片/17.jpg', resolution: '4398x3200', size: '2.84 MB' },
+                { type: 'image', src: '图片/18.jpg', resolution: '3200x4800', size: '1.95 MB' },
+                { type: 'image', src: '图片/19.jpg', resolution: '3200x4546', size: '1.64 MB' },
+                { type: 'image', src: '图片/20.jpg', resolution: '4800x6792', size: '3.01 MB' },
+                { type: 'image', src: '图片/21.jpg', resolution: '8816x4959', size: '5.86 MB' },
+                { type: 'image', src: '图片/22.jpg', resolution: '5120x5120', size: '3.58 MB' },
+                { type: 'image', src: '图片/23.jpg', resolution: '3942x5348', size: '5.49 MB' },
+                { type: 'image', src: '图片/24.jpg', resolution: '4000x4928', size: '3.95 MB' },
+                { type: 'image', src: '图片/25.jpg', resolution: '5120x3200', size: '1.87 MB' },
+                { type: 'image', src: '图片/26.png', resolution: '3850x2746', size: '10.23 MB' },
+                { type: 'image', src: '图片/27.jpg', resolution: '4320x5400', size: '14.21 MB' },
+                { type: 'image', src: '图片/28.jpg', resolution: '4398x3200', size: '4.30 MB' },
+                { type: 'image', src: '图片/29.jpg', resolution: '1504x2005', size: '1.05 MB' },
+                { type: 'image', src: '图片/30.jpg', resolution: '4921x9000', size: '3.56 MBB' },
+                { type: 'image', src: '图片/31.jpg', resolution: '8816x6400', size: '8.83 MB' },
+                { type: 'image', src: '图片/32.jpg', resolution: '7680x5068', size: '3.54 MB' },
+                { type: 'image', src: '图片/33.jpg', resolution: '4000x5504', size: '1.70 MB' },
+                { type: 'image', src: '图片/34.jpg', resolution: '2199x1600', size: '1.24 MB' },
+                { type: 'image', src: '图片/35.jpg', resolution: '4320x7680', size: '4.76 MB' },
+                { type: 'image', src: '图片/36.jpg', resolution: '4320x2432', size: '2.68 MB' },
+                { type: 'image', src: '图片/37.jpg', resolution: '2166x4000', size: '7.58 MB' },
+                { type: 'image', src: '图片/38.jpg', resolution: '6836x12000', size: '4.93 MB' },
+                { type: 'image', src: '图片/39.jpg', resolution: '5588x3492', size: '3.31 MB'},
+                { type: 'image', src: '图片/40.jpg', resolution: '8640x12952', size: '6.87 MB'},
+                { type: 'image', src: '图片/41.jpg', resolution: '4320x7680', size: '2.47 MB' },
+                { type: 'image', src: '图片/42.jpg', resolution: '8084x4503', size: '4.69 MB' },
+                { type: 'image', src: '图片/43.jpg', resolution: '5120x3660', size: '3.30 MB' },
+                { type: 'image', src: '图片/44.jpg', resolution: '4921x9000', size: '3.56 MB' },
+                { type: 'image', src: '图片/45.jpg', resolution: '4316x7680', size: '3.05 MB' },
+                { type: 'image', src: '图片/46.jpg', resolution: '6400x6400', size: '4.10 MB' },
+                { type: 'image', src: '图片/47.jpg', resolution: '5788x8184', size: '4.08 MB' },        
+            ],
+            video: [
+            // 视频资源列表
+            { type: 'video', src: '视频/CM1.mp4', resolution: '官方CM', size: '15.3 MB' },
+            { type: 'video', src: '视频/CM2.mp4', resolution: '官方CM', size: '9.92 MB' },
+            { type: 'video', src: '视频/CM3.mp4', resolution: '官方CM', size: '5.05 MB' },
+            { type: 'video', src: '视频/PV1.mp4', resolution: '官方PV', size: '12.7 MB' },
+            { type: 'video', src: '视频/PV2.mp4', resolution: '官方PV', size: '14.1 MB' },
+            { type: 'video', src: '视频/紫羅蘭永恒花园.mp4', resolution: '自制', size: '191 MB' },
+            { type: 'video', src: '视频/二类-副本.mp4', resolution: '自制', size: '63.9 MB' },
+            { type: 'video', src: '视频/001（60FPS）.mp4', resolution: '自制', size: '64.1 MB' },
+            { type: 'video', src: '视频/dy01.mp4', resolution: '转载', size: '5.52 MB' },
+            { type: 'video', src: '视频/dy02.mp4', resolution: '转载', size: '6.47 MB' },
+
+        ]
+    };
+        
+
+        // 初始化媒体查看器 
+        function initMediaViewer() {
+            document.querySelectorAll('.resource-media').forEach(media => {
+                media.onclick = (e) => {
+                    const src = e.target.src;
+                    const type = e.target.tagName === 'IMG' ? 'image' : 'video';
+                    openMediaViewer(src, type);
+                };
+            });
+        }
+
+        function openMediaViewer(src, type) {
+    const viewer = document.getElementById('mediaViewer');
+    const container = document.getElementById('mediaContainer');
+    const loading = document.querySelector('.media-loading');
+
+    viewer.style.display = 'block';
+    loading.style.display = 'block';
+    container.innerHTML = '';
+
+    if (type === 'image') {
+        const img = new Image();
+        img.onload = () => {
+            loading.style.display = 'none';
+            img.classList.add('media-content');
+            container.appendChild(img);
+        };
+        img.src = src;
+    } else if (type === 'video') {
+        const video = document.createElement('video');
+        video.controls = true; // 必须添加 controls 属性
+        video.autoplay = true;
+        video.classList.add('media-content', 'video-content');
+        video.onloadeddata = () => {
+            loading.style.display = 'none';
+            container.appendChild(video);
+        };
+        video.src = src;
+    }
+
+    // 统一错误处理
+    const media = type === 'image' ? img : video;
+    media.onerror = () => {
+        loading.textContent = `${type === 'image' ? '图片' : '视频'}加载失败`;
+        setTimeout(() => viewer.style.display = 'none', 2000);
+    };
+}
+
+        // 关闭媒体查看器
+        function closeMediaViewer() {
+            document.getElementById('mediaViewer').style.display = 'none';
+        }
+
+        // 显示详情页
+        document.querySelectorAll('.resource-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const content = resources[this.dataset.id].map(item => `
+                    <div class="resource-item">
+                        <img class="resource-media" src="${item.src}" 
+                             alt="${item.resolution}" 
+                             loading="lazy"
+                             data-resolution="${item.resolution}"
+                             data-size="${item.size}">
+                        <div class="meta-info">
+                            <span>${item.resolution}</span>
+                            <span>${item.size}</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('detailContent').innerHTML = content;
+                document.getElementById('detailView').classList.add('active');
+                
+                // 初始化媒体查看器
+                setTimeout(initMediaViewer, 100);
+            });
+        });
+
+        // 关闭详情页
+        function closeDetail() {
+            document.getElementById('detailView').classList.remove('active');
+        }
+
+        // 全局事件监听
+        window.addEventListener('click', (e) => {
+            if(e.target.classList.contains('media-viewer')) {
+                closeMediaViewer();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') {
+                closeDetail();
+                closeMediaViewer();
+            }
+        });
+</script>
+
+    <!-- 音乐播放器 -->
+    <div class="music-player">
+        <button class="music-control" onclick="changeTrack(-1)">
+            <i class="fas fa-step-backward"></i>
+        </button>
+        <div class="album-container" onclick="toggleMusic()">
+            <img src="专辑封面\001.jpg" alt="专辑封面" width="40" style="border-radius: 50%">
+        </div>
+        <button class="music-control" onclick="changeTrack(1)">
+            <i class="fas fa-step-forward"></i>
+        </button>
+    </div>
+
+    <!-- 捐助按钮 -->
+    <button class="donate-btn" onclick="showDonate()">
+        <i class="fas fa-heart"></i>
+        <span>为爱发电</span>
+    </button>
+    <!-- 捐助弹窗 -->
+    <div class="donate-modal" id="donateModal">
+        <div class="donate-box">
+            <div class="donate-close" onclick="closeDonate()">&times;</div>
+            <h3>感谢您的支持！</h3>
+            <div class="qrcode-group">
+                <div class="qrcode-item">
+                    <img src="为爱发电\ZFB.jpg" alt="支付宝收款码">
+                    <div class="qrcode-label">支付宝扫码</div>
+                </div>
+                <div class="qrcode-item">
+                    <img src="为爱发电\VX.jpg" alt="微信收款码">
+                    <div class="qrcode-label">微信扫码</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 底部声明 -->
+    <footer class="site-footer">
+        <p>© 2025 紫罗兰永恒花园 | 本站仅供学习参考，部分素材来源于网络</p >
+    </footer>
+
+    <script>
+ 
+        // 捐助功能
+        function showDonate() {
+            document.getElementById('donateModal').style.display = 'flex';
+        }
+
+        function closeDonate() {
+            document.getElementById('donateModal').style.display = 'none';
+        }
+
+
+
+    </script>
+</body>
+</html>
