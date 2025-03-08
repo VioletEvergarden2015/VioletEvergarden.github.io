@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>紫罗兰永恒花园(Video)</title>
+    <link rel="icon" href="favicon.ico">
+    <meta name="keywords" content="紫罗兰永恒花园, 紫罗兰, 薇尔莉特，薇尔莉特伊芙加登，薇尔莉特-伊芙加登,晓佳奈,基尔伯特,布甘比利亚,violet,VioletEverGarden,ヴァイオレット・エヴァーガーデン,ヴァイオレット">
+    <meta name="description" content="紫罗兰永恒花园(ヴァイオレット・エヴァーガーデン)">
+    <script type="text/javascript" src="0.js"></script>
+    <style>
+                /* 视频背景 */
+                .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        #bgVideo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            filter: blur(0px) brightness(1);
+            object-fit: cover;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        /* 左侧图标容器 */
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-right: auto;
+        }
+
+        /* PNG图标样式 */
+        .brand-logo {
+            width: 50px;  /* 根据实际图标尺寸调整 */
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        /* 标题样式 */
+        .brand-text {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* 悬停动效 */
+        .brand-logo:hover {
+            transform: scale(1.1);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+            
+            .brand-logo {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .brand-text {
+                font-size: 1.2rem;
+            }
+        }
+
+    /* 添加关键帧动画 */
+    @keyframes slideUp {
+        from {
+         opacity: 0;
+         transform: translateY(50px); /* 初始位置下移 */
+        }
+           to {
+         opacity: 1;                 /* 渐变显示 */
+         transform: translateY(0);   /* 滑动到原始位置 */
+  }
+}
+
+    .multi-video-card {
+        background: #ffffff00;
+        border-radius: 12px;
+        margin: 1rem 0;
+        padding: 1.5rem;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        cursor: pointer;
+    }
+
+    .video-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 固定2列 */
+        gap: 15px; /* 增加间距 */
+        margin-top: 15px;
+    }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+        .video-grid {
+            grid-template-columns: repeat(1, 1fr); /* 小屏幕改为1列 */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .video-grid {
+            grid-template-columns: 1fr; /* 超小屏幕改为1列 */
+        }
+    }
+    .video-thumbnail {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        aspect-ratio: 16/9;
+        background: #000;
+    }
+
+    .video-thumbnail video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.3s;
+    }
+
+    .video-count {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: rgba(0,0,0,0.7);
+        color: rgba(255, 255, 255, 0.068);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    /* 详情页样式 */
+    .detail-view {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .video-container {
+        width: 90%;
+        max-width: 800px;
+        position: relative;
+    }
+
+    #fullscreen-video {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: -30px;
+        right: 0;
+        color: rgba(255, 255, 255, 0);
+        font-size: 24px;
+        cursor: pointer;
+    }
+            /* 底部声明 */
+            .site-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0);
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin-top: 80px;
+            }
+            
+            .music-player {
+                bottom: 60px;
+                width: calc(100% - 40px);
+            }
+            
+            .qrcode-group {
+                flex-direction: column;
+            }
+        }
+
+                /* 新增悬停播放样式 */
+                .video-thumbnail video {
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .video-thumbnail:hover video {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+    <audio controls="controls" autoplay="autoplay" src="music2.mp3.mp3"></audio>
+    <!-- 视频背景 -->
+    <div class="video-background">
+        <video autoplay muted loop id="bgVideo">
+            <source src="背景.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="logo.png" 
+                 alt="网站Logo" 
+                 class="brand-logo"
+                 loading="lazy">
+            <h1 class="brand-text">紫罗兰永恒花园</h1>
+        </div>
+        <div class="contact-info">
+            <span><i class="fas fa-phone"></i>178-3549-7007</span>
+            <span><i class="fas fa-envelope"></i>-3577186595@qq.com</span>
+        </div>
+    </nav>
+    <!-- 多视频卡片 -->
+    <div class="multi-video-card" data-id="1">
+        <h3>精选视频</h3>
+        <p>包含官方、自制、转载</p >
+        <div class="video-grid">
+            <div class="video-thumbnail" data-index="0">
+                <video muted loop playsinline src="视频/dy02.mp4#t=0.1"></video>
+                <div class="video-count">01</div>
+            </div>
+            <div class="video-thumbnail" data-index="1">
+                <video muted loop playsinline src="视频/dy01.mp4#t=0.1"></video>
+                <div class="video-count">02</div>
+            </div>
+            <div class="video-thumbnail" data-index="2">
+                <video muted loop playsinline src="视频/紫羅蘭永恒花园.mp4#t=0.1"></video>
+                <div class="video-count">03</div>
+            </div>
+            <div class="video-thumbnail" data-index="3">
+                <video muted loop playsinline src="视频\二类-副本.mp4#t=0.1"></video>
+                <div class="video-count">04</div>
+            </div>
+            <div class="video-thumbnail" data-index="4">
+                <video muted loop playsinline src="视频\001（60FPS）.mp4#t=0.1"></video>
+                <div class="video-count">05</div>
+            </div>
+            <div class="video-thumbnail" data-index="5">
+                <video muted loop playsinline src="视频\CM1.mp4#t=0.1"></video>
+                <div class="video-count">06</div>
+            </div>
+            <div class="video-thumbnail" data-index="6">
+                <video muted loop playsinline src="视频\CM2.mp4#t=0.1"></video>
+                <div class="video-count">07</div>
+            </div>
+            <div class="video-thumbnail" data-index="7">
+                <video muted loop playsinline src="视频\CM3.mp4#t=0.1"></video>
+                <div class="video-count">08</div>
+            </div>
+            <div class="video-thumbnail" data-index="8">
+                <video muted loop playsinline src="视频\PV1.mp4#t=0.1"></video>
+                <div class="video-count">09</div>
+            </div>
+            <div class="video-thumbnail" data-index="9">
+                <video muted loop playsinline src="视频\PV2.mp4#t=0.1"></video>
+                <div class="video-count">10</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 视频详情页 -->
+    <div class="detail-view" id="detailView">
+        <div class="video-container">
+            <div class="close-btn" onclick="hideDetail()"></div>
+            <video id="fullscreen-video" controls></video>
+        </div>
+    </div>
+
+    <script>
+        
+    // 视频数据
+    const videoCollections = {
+        1: {
+            title: "紫罗兰永恒花园",
+            videos: [
+                {
+                    title: "转载",
+                    url: "视频/dy02.mp4",
+                    duration: "0:10"
+                },
+                {
+                    title: "转载",
+                    url: "视频/dy01.mp4", 
+                    duration: "0:20"
+                },
+                {
+                    title: "自制",
+                    url: "视频/紫羅蘭永恒花园.mp4",
+                    duration: "0:33"
+                },
+                {
+                    title: "自制",
+                    url: "视频/二类-副本.mp4",
+                    duration: "0:13"
+                },
+                {
+                    title: "自制",
+                    url: "视频/001（60FPS）.mp4",
+                    duration: "0:12"
+                },
+                {
+                    title: "官方CM",
+                    url: "视频/CM1.mp4",
+                    duration: "0:46"
+                },
+                {
+                    title: "官方CM",
+                    url: "视频/CM2.mp4",
+                    duration: "0:30"
+                },
+                {
+                    title: "官方CM",
+                    url: "视频/CM3.mp4",
+                    duration: "0:15"
+                },
+                {
+                    title: "官方PV",
+                    url: "视频/PV1.mp4",
+                    duration: "0:38"
+                },
+                {
+                    title: "官方PV",
+                    url: "视频/PV2.mp4",
+                    duration: "0:43"
+                },
+                
+                
+            ]
+        }
+    }
+
+        // 新增悬停播放逻辑
+        document.querySelectorAll('.video-thumbnail').forEach(thumbnail => {
+            const video = thumbnail.querySelector('video')
+            let isHovering = false
+    
+            // 桌面端悬停
+            thumbnail.addEventListener('mouseenter', () => {
+                isHovering = true
+                video.currentTime = 0
+                video.play().catch(() => {})
+            })
+    
+            thumbnail.addEventListener('mouseleave', () => {
+                isHovering = false
+                video.pause()
+                video.currentTime = 0
+            })
+    
+            // 移动端触摸
+            thumbnail.addEventListener('touchstart', () => {
+                if (!isHovering) {
+                    video.currentTime = 0
+                    video.play().catch(() => {})
+                }
+            })
+        })
+
+    // 点击缩略图处理
+    document.querySelectorAll('.video-thumbnail').forEach(thumbnail => {
+        thumbnail.addEventListener('click', function(e) {
+            e.stopPropagation()
+            const cardId = this.closest('.multi-video-card').dataset.id
+            const videoIndex = parseInt(this.dataset.index)
+            playFullVideo(cardId, videoIndex)
+        })
+    })
+
+    // 播放完整视频
+    function playFullVideo(cardId, videoIndex) {
+        const collection = videoCollections[cardId]
+        if (!collection || !collection.videos[videoIndex]) return
+
+        const videoData = collection.videos[videoIndex]
+        const videoPlayer = document.getElementById('fullscreen-video')
+        
+        // 设置视频源
+        videoPlayer.src = videoData.url
+        videoPlayer.poster = '' // 清除海报图
+        
+        // 显示详情页
+        const detailView = document.getElementById('detailView')
+        detailView.style.display = 'flex'
+        
+        // 开始播放（需要用户交互后）
+        videoPlayer.load()
+        videoPlayer.play().catch(error => {
+            console.log('自动播放被阻止，需要用户点击:', error)
+        })
+    }
+
+    // 关闭详情页
+    function hideDetail() {
+        const videoPlayer = document.getElementById('fullscreen-video')
+        videoPlayer.pause()
+        videoPlayer.removeAttribute('src')
+        document.getElementById('detailView').style.display = 'none'
+    }
+
+    // ESC键关闭
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') hideDetail()
+    })
+    </script>
+        <!-- 底部声明 -->
+        <footer class="site-footer">
+            <p>© 2025 紫罗兰永恒花园 | 本站仅供学习参考，部分素材来源于网络，如有侵权，请联系删除</p >
+        </footer>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
